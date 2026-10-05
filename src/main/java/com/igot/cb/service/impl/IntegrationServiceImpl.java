@@ -1,6 +1,5 @@
 package com.igot.cb.service.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.uuid.Generators;
 import com.igot.cb.exception.CustomException;
 import com.igot.cb.model.ExternalApiIntegrationDTO;
@@ -12,7 +11,6 @@ import com.igot.cb.service.IntegrationService;
 import com.igot.cb.util.JWTTokenGeneratorUtil;
 import com.igot.cb.validator.IntegrationValidator;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.ReactiveRedisOperations;
 import org.springframework.stereotype.Service;
@@ -24,33 +22,32 @@ import java.util.UUID;
 @Slf4j
 public class IntegrationServiceImpl implements IntegrationService {
 
-    @Autowired
-    private IntegrationValidator integrationValidator;
-
-    @Autowired
-    private APICallService apiCallService;
-
-    @Autowired
-    private Producer producer;
-
-    @Autowired
-    private EnrichmentService enrichmentService;
+    private final IntegrationValidator integrationValidator;
+    private final APICallService apiCallService;
+    private final Producer producer;
+    private final EnrichmentService enrichmentService;
+    private final JWTTokenGeneratorUtil tokenGeneratorUtil;
+    private final ReactiveRedisOperations<String, ResponseDTO> cacheOps;
 
     @Value("${integration.kafka.create.topic}")
     private String callExternalServiceTopic;
 
-    @Autowired
-    private JWTTokenGeneratorUtil tokenGeneratorUtil;
-    @Autowired
-    ObjectMapper objectMapper;
-    private final ReactiveRedisOperations<String, ResponseDTO> cacheOps;
-
-    public IntegrationServiceImpl(ReactiveRedisOperations<String, ResponseDTO> cacheOps) {
+    public IntegrationServiceImpl(IntegrationValidator integrationValidator,
+                                   APICallService apiCallService,
+                                   Producer producer,
+                                   EnrichmentService enrichmentService,
+                                   JWTTokenGeneratorUtil tokenGeneratorUtil,
+                                   ReactiveRedisOperations<String, ResponseDTO> cacheOps) {
+        this.integrationValidator = integrationValidator;
+        this.apiCallService = apiCallService;
+        this.producer = producer;
+        this.enrichmentService = enrichmentService;
+        this.tokenGeneratorUtil = tokenGeneratorUtil;
         this.cacheOps = cacheOps;
     }
 
     @Override
-    public Mono<ResponseDTO> createExternalAPICall(ExternalApiIntegrationDTO integrationDTO) {
+    public Mono<ResponseDTO> createExternalAPICall(ExternalApiIntegrationDTO<?> integrationDTO) {
         log.info("IntegrationServiceImpl::createExternalAPICall");
 
 

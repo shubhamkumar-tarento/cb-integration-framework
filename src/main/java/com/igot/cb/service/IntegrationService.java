@@ -6,5 +6,5 @@ import reactor.core.publisher.Mono;
 
 public interface IntegrationService {
 
-    Mono<ResponseDTO> createExternalAPICall(ExternalApiIntegrationDTO integrationDTO);
+    Mono<ResponseDTO> createExternalAPICall(ExternalApiIntegrationDTO<?> integrationDTO);
 }

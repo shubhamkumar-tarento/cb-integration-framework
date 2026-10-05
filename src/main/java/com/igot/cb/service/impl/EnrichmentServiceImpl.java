@@ -10,11 +10,11 @@ import org.springframework.stereotype.Service;
 public class EnrichmentServiceImpl implements EnrichmentService {
 
     @Override
-    public void enrich(ExternalApiIntegrationDTO integrationDTO) {
+    public void enrich(ExternalApiIntegrationDTO<?> integrationDTO) {
         enrichDefaultHeader(integrationDTO);
     }
 
-    //default values
-    private void enrichDefaultHeader(ExternalApiIntegrationDTO integrationDTO) {
+    private void enrichDefaultHeader(ExternalApiIntegrationDTO<?> integrationDTO) {
+        log.debug("EnrichmentServiceImpl::enrichDefaultHeader::{}", integrationDTO);
     }
 }

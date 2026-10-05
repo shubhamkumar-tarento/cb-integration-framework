@@ -6,7 +6,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Component;
@@ -23,8 +22,11 @@ public class JWTTokenGeneratorUtil {
     @Value("${jwt.secret.key}")
     private String jwtSecretKey;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
+
+    public JWTTokenGeneratorUtil(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 
     public String generateRedisJwtTokenKey(Object requestBody, String url, String operationType) {
         String jwtToken = "";

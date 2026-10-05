@@ -12,12 +12,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class RestExceptionHandler {
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity handleException(Exception ex) {
+    public ResponseEntity<ErrorResponse> handleException(Exception ex) {
         log.debug("RestExceptionHandler::handleException::" + ex);
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-        ErrorResponse errorResponse = null;
-        if (ex instanceof CustomException) {
-            CustomException customException = (CustomException) ex;
+        ErrorResponse errorResponse;
+        if (ex instanceof CustomException customException) {
             status = HttpStatus.BAD_REQUEST;
             errorResponse = ErrorResponse.builder()
                     .code(customException.getCode())

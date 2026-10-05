@@ -5,7 +5,6 @@ import com.igot.cb.model.ExternalApiIntegrationDTO;
 import com.igot.cb.model.ResponseDTO;
 import com.igot.cb.service.IntegrationService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -15,15 +14,16 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class IntegrationController {
 
-    @Autowired
-    private IntegrationService IntegrationService;
+    private final IntegrationService integrationService;
+
+    public IntegrationController(IntegrationService integrationService) {
+        this.integrationService = integrationService;
+    }
 
     @PostMapping("/v1/create-external-call")
-    public Mono<ResponseDTO> createExternalAPICall(@RequestBody ExternalApiIntegrationDTO integrationDTO) {
+    public Mono<ResponseDTO> createExternalAPICall(@RequestBody ExternalApiIntegrationDTO<?> integrationDTO) {
         try {
-            Mono<ResponseDTO> responseDTOMono = IntegrationService.createExternalAPICall(integrationDTO);
-
-            return responseDTOMono;
+            return integrationService.createExternalAPICall(integrationDTO);
         } catch (Exception e) {
             return Mono.error(e);
         }

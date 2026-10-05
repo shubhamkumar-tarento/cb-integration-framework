@@ -7,7 +7,6 @@ import com.igot.cb.model.ExternalApiIntegrationDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -16,16 +15,23 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Slf4j
 public class IntegrationValidator {
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
 
+    public IntegrationValidator(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 
-    public void validate(ExternalApiIntegrationDTO integrationDTO) {
+    public void validate(ExternalApiIntegrationDTO<?> integrationDTO) {
         log.info("IntegrationServiceImpl::validate");
         if (integrationDTO == null) {
             throw new CustomException("MISSING_REQUEST", "request is missing!");
         }
 
+        validateMandatoryFields(integrationDTO);
+        validateRequestBody(integrationDTO);
+    }
+
+    private void validateMandatoryFields(ExternalApiIntegrationDTO<?> integrationDTO) {
         if (StringUtils.isBlank(integrationDTO.getServiceName())) {
             throw new CustomException("SERVICE_NAME", "service name is missing in request!");
         }
@@ -43,32 +49,31 @@ public class IntegrationValidator {
             throw new CustomException("REQUEST_HEADERS", "request headers are missing in request");
         }
 
-        if(integrationDTO.getOperationType() == null || !EnumUtils.isValidEnum(ExternalApiIntegrationDTO.OperationType.class,integrationDTO.getOperationType().name())){
-            throw new CustomException("OPERATION_TYPE","Operation type is not valid!");
+        if (integrationDTO.getOperationType() == null || !EnumUtils.isValidEnum(ExternalApiIntegrationDTO.OperationType.class, integrationDTO.getOperationType().name())) {
+            throw new CustomException("OPERATION_TYPE", "Operation type is not valid!");
         }
+    }
 
-        //request body
+    private void validateRequestBody(ExternalApiIntegrationDTO<?> integrationDTO) {
         if (integrationDTO.getRequestBody() == null
                 && integrationDTO.getRequestMethod() != null
                 && integrationDTO.getRequestMethod() != ExternalApiIntegrationDTO.RequestMethod.GET) {
             throw new CustomException("MISSING_REQUEST_BODY", "request body is missing in request");
-        } else {
-            //check is it a valid json
-            boolean isValid = Boolean.FALSE;
-            try {
-                if (integrationDTO.getRequestBody() != null) {
-                    objectMapper.writeValueAsString(integrationDTO.getRequestBody());
-                }
-                isValid = Boolean.TRUE;
-            } catch (JsonProcessingException e) {
-            }
-            if (!isValid) {
-                throw new CustomException("INVALID_REQUEST_BODY", "request body is a invalid json");
-            }
         }
 
+        if (integrationDTO.getRequestBody() != null && !isValidJson(integrationDTO.getRequestBody())) {
+            throw new CustomException("INVALID_REQUEST_BODY", "request body is a invalid json");
+        }
     }
 
-
+    private boolean isValidJson(Object requestBody) {
+        try {
+            objectMapper.writeValueAsString(requestBody);
+            return true;
+        } catch (JsonProcessingException e) {
+            log.debug("request body is not a valid json", e);
+            return false;
+        }
+    }
 
 }
