@@ -62,7 +62,7 @@ class ExternalApiIntegrationDTOTest {
         assertThat(ExternalApiIntegrationDTO.OperationType.fromValue("FIRE_AND_FORGET"))
                 .isEqualTo(ExternalApiIntegrationDTO.OperationType.FIRE_AND_FORGET);
         assertThat(ExternalApiIntegrationDTO.OperationType.fromValue("UNKNOWN")).isNull();
-        assertThat(ExternalApiIntegrationDTO.OperationType.PEER_TO_PEER.toString()).isEqualTo("PEER_TO_PEER");
+        assertThat(ExternalApiIntegrationDTO.OperationType.PEER_TO_PEER).hasToString("PEER_TO_PEER");
     }
 
     @Test
@@ -84,6 +84,6 @@ class ExternalApiIntegrationDTOTest {
         assertThat(ExternalApiIntegrationDTO.RequestMethod.fromValue("HEAD"))
                 .isEqualTo(ExternalApiIntegrationDTO.RequestMethod.HEAD);
         assertThat(ExternalApiIntegrationDTO.RequestMethod.fromValue("UNKNOWN")).isNull();
-        assertThat(ExternalApiIntegrationDTO.RequestMethod.GET.toString()).isEqualTo("GET");
+        assertThat(ExternalApiIntegrationDTO.RequestMethod.GET).hasToString("GET");
     }
 }
